@@ -12,3 +12,13 @@ export const GitUserList = async (params) => {
     params
   })
 }
+/**
+ * 添加用户数据
+ *
+ * */
+export const AddUser = async (params) => {
+  return request('/api/admin/users',{
+    method: 'post',
+    params
+  })
+}

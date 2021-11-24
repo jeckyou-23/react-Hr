@@ -1,150 +1,108 @@
-import React from 'react';
+import React , {useState,useRef} from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Space } from 'antd';
-import type { ProColumns } from '@ant-design/pro-table';
+import { Button, Tag, Space, Switch } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import request from 'umi-request';
-import {GetUserList} from '@/services/userlist/userlist';
-
-
-
+import { GitUserList } from '@/services/userlist/userlist';
+import AddUser from './Components/AddUser';
+import { PageContainer } from '@ant-design/pro-layout';
 
 const UserList = () => {
 
-type GithubIssueItem = {
-  url: string;
-  id: number;
-  number: number;
-  title: string;
-  labels: {
-    name: string;
-    color: string;
-  }[];
-  state: string;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at?: string;
-};
-const columns: ProColumns<GithubIssueItem>[] = [
+  //定义模态框是否显示状态
+  const [isShowCreateModel,setIsShowCreateModel] = useState(false);
+  const [isShowEditModel,setIsShowEditModel] = useState(false);
+  const actionRef = useState();
+
+  //获取列表数据
+  const getData = async (params) => {
+    const response = await GitUserList(params)
+    return {
+      data: response.data,
+      success: true,
+      total: response.meta.pagination.total
+    }
+  }
+  //是否显示添加用户model
+  const isShowClick = (show) => {
+    setIsShowCreateModel(show)
+  }
+
+const columns = [
   {
-    title: '标题',
-    dataIndex: 'title',
-    copyable: true,
-    ellipsis: true,
-    tip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-    width: '30%',
+    title:'头像',
+    dataIndex: 'avatar',
+    hideInSearch: true
   },
   {
-    title: '状态',
-    dataIndex: 'state',
-    filters: true,
-    onFilter: true,
-    valueType: 'select',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-    valueEnum: {
-      all: { text: '全部', status: 'Default' },
-      open: {
-        text: '未解决',
-        status: 'Error',
-      },
-      closed: {
-        text: '已解决',
-        status: 'Success',
-        disabled: true,
-      },
-      processing: {
-        text: '解决中',
-        status: 'Processing',
-      },
-    },
+    title:'姓名',
+    dataIndex: 'name',
   },
   {
-    title: '标签',
-    dataIndex: 'labels',
-    search: false,
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-    renderFormItem: (_, { defaultRender }) => {
-      return defaultRender(_);
-    },
-    render: (_, record) => (
-      <Space>
-        {record.labels.map(({ name, color }) => (
-          <Tag color={color} key={name}>
-            {name}
-          </Tag>
-        ))}
-      </Space>
-    ),
+    title: '邮箱',
+    dataIndex: 'email'
+  },
+  {
+    title: '是否禁用',
+    dataIndex: 'is_locked',
+    hideInSearch:true,
+    render:(_,record)=><Switch
+      checkedChildren="启用"
+      unCheckedChildren="禁用"
+  />
   },
   {
     title: '创建时间',
-    key: 'showTime',
     dataIndex: 'created_at',
-    valueType: 'date',
-    hideInSearch: true,
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
+    hideInSearch: true
   },
+  {
+    title:'操作',
+    hideInSearch: true
+  }
 ];
 
 
+  // @ts-ignore
+  // @ts-ignore
   return (
-    <ProTable<GithubIssueItem>
-         columns={columns}
-         request={async (params = {}) =>
-           request<{
-             data: GithubIssueItem[];
-           }>('https://proapi.azurewebsites.net/github/issues', {
-             params,
-           })
-         }
-         rowKey="id"
-         search={{
-           labelWidth: 'auto',
-         }}
-         form={{
-           ignoreRules: false,
-         }}
-         pagination={{
-           pageSize: 5,
-         }}
-         dateFormatter="string"
-         headerTitle="高级表格"
-         toolBarRender={() => [
-           <Button key="button" icon={<PlusOutlined />} type="primary">
-             新建
-           </Button>,
-         ]}
-       />
+    <div>
+      <PageContainer>
+        <ProTable
+        columns={columns}
+        actionRef={actionRef}
+        request={(params) => getData(params)}
+        rowKey="id"
+        columnsState={ {
+          persistenceKey: 'pro-table-singe-demos',
+          persistenceType: 'localStorage',
+        } }
+        search={{
+          labelWidth: 'auto',
+          resetText:"重置"
+        }}
+        form={{
+          ignoreRules: false,
+        }}
+        pagination={{
+          pageSize: 10,
+        }}
+        dateFormatter="string"
+        headerTitle="用户管理"
+        toolBarRender={() => [
+          <Button key="button" icon={<PlusOutlined />} type="primary" onClick={()=>isShowClick(true)}>
+            新建
+          </Button>
+        ]}
+      />
+      <AddUser
+        isShowCreateModel = {isShowCreateModel}
+        isShowClick = {isShowClick}
+        actionRef={actionRef}
+      />
+      </PageContainer>
+      {/*return <Skeleton type="list" />/*/}
+    </div>
+
   );
 };
 
