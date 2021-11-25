@@ -28,9 +28,9 @@ const UserList = () => {
   const isShowClick = (show) => {
     setIsShowCreateModel(show)
   }
-  const isShowEdit = (show , UserId) => {
+  const isShowEdit = (show,id) => {
     setIsShowEditModel(show)
-    setUserId(UserId)
+    setUserId(id)
   }
   //更改状态时间lock
 const lock = async (params) => {
@@ -62,7 +62,7 @@ const columns = [
     render:(_,record)=><Switch
       checkedChildren="启用"
       unCheckedChildren="禁用"
-      defaultChecked={record.is_locked === 0}
+      defaultChecked={record.is_locked == 1}
       onClick={()=>lock(record.id)}
   />
   },
@@ -116,12 +116,16 @@ const columns = [
         isShowClick = {isShowClick}
         actionRef={actionRef}
       />
-        <EditUser
-          isShowEditModel = {isShowEditModel}
-          userId = {userId}
-          isShowEdit = {isShowEdit}
-          actionRef = {actionRef}
-        />
+        {
+          userId ?
+          <EditUser
+            isShowEditModel = {isShowEditModel}
+            userId = {userId}
+            isShowEdit = {isShowEdit}
+            actionRef = {actionRef}
+          /> : undefined
+        }
+
       </PageContainer>
       {/*return <Skeleton type="list" />/*/}
     </div>

@@ -35,9 +35,10 @@ export const ChangeLock = async (params) => {
 /**
  * 修改用户数据
  * */
-export const EditUsers = async (params) => {
-  return request(`/api/admin/users/${params}`,{
+export const EditUsers = async (params , userId) => {
+  return request(`/api/admin/users/${userId}`,{
     method: 'PUT',
+    params
   })
 }
 /**

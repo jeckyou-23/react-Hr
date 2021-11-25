@@ -27,6 +27,11 @@
     component: './UserList'
   },
   {
+    path: '/goodslist',
+    name: 'goodslist',
+    component: './GoodsList'
+  },
+  {
     component: './404',
   },
 ];
