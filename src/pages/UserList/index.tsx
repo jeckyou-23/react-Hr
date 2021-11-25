@@ -1,9 +1,10 @@
 import React , {useState,useRef} from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, Switch } from 'antd';
+import {PlusOutlined,UserOutlined} from '@ant-design/icons';
+import { Button, Switch,Message ,Avatar } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { GitUserList } from '@/services/userlist/userlist';
-import AddUser from './Components/AddUser';
+import { GitUserList , ChangeLock } from '@/services/userlist/userlist';
+import AddUser from "@/pages/UserList/Components/AddUser";
+import EditUser from '@/pages/UserList/Components/EditUser';
 import { PageContainer } from '@ant-design/pro-layout';
 
 const UserList = () => {
@@ -11,7 +12,8 @@ const UserList = () => {
   //定义模态框是否显示状态
   const [isShowCreateModel,setIsShowCreateModel] = useState(false);
   const [isShowEditModel,setIsShowEditModel] = useState(false);
-  const actionRef = useState();
+  const [userId,setUserId] = useState(undefined);
+  const actionRef = useRef(null);
 
   //获取列表数据
   const getData = async (params) => {
@@ -26,12 +28,24 @@ const UserList = () => {
   const isShowClick = (show) => {
     setIsShowCreateModel(show)
   }
-
+  const isShowEdit = (show , UserId) => {
+    setIsShowEditModel(show)
+    setUserId(UserId)
+  }
+  //更改状态时间lock
+const lock = async (params) => {
+   await ChangeLock(params).then(()=>{
+    Message.success('操作成功')
+  }).catch(()=>{
+    Message.error('操作失败')
+  })
+}
 const columns = [
   {
     title:'头像',
-    dataIndex: 'avatar',
-    hideInSearch: true
+    dataIndex: 'avatar_url',
+    hideInSearch: true,
+    render:(_,record)=><Avatar src={record.avatar_url} size={32} icon={<UserOutlined />} />
   },
   {
     title:'姓名',
@@ -42,12 +56,14 @@ const columns = [
     dataIndex: 'email'
   },
   {
-    title: '是否禁用',
+    title: '状态',
     dataIndex: 'is_locked',
     hideInSearch:true,
     render:(_,record)=><Switch
       checkedChildren="启用"
       unCheckedChildren="禁用"
+      defaultChecked={record.is_locked === 0}
+      onClick={()=>lock(record.id)}
   />
   },
   {
@@ -57,7 +73,8 @@ const columns = [
   },
   {
     title:'操作',
-    hideInSearch: true
+    hideInSearch: true,
+    render:(_,record)=><Button type="primary" onClick={()=>isShowEdit(true,record.id)}>编辑</Button>
   }
 ];
 
@@ -99,6 +116,12 @@ const columns = [
         isShowClick = {isShowClick}
         actionRef={actionRef}
       />
+        <EditUser
+          isShowEditModel = {isShowEditModel}
+          userId = {userId}
+          isShowEdit = {isShowEdit}
+          actionRef = {actionRef}
+        />
       </PageContainer>
       {/*return <Skeleton type="list" />/*/}
     </div>

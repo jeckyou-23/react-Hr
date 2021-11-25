@@ -14,7 +14,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: '人事管理',
   pwa: false,
-  logo: 'https://ccidcdn.wkjc.cn/Fnw40Zi4TjMaTGkBVAEmx69aBjYt.png',
+  logo: 'https://www.eduwork.cn/images/logo.png',
   iconfontUrl: '',
 };
 
