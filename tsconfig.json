@@ -12,6 +12,8 @@
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
+    "noImplicitThis": false,
+    "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "allowJs": true,
@@ -21,7 +23,10 @@
     "paths": {
       "@/*": ["./src/*"],
       "@@/*": ["./src/.umi/*"]
-    }
+    },
+    "typeRoots": [
+      "src/typings.d.ts"
+    ]
   },
   "include": [
     "mock/**/*",

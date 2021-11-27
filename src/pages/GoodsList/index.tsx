@@ -1,17 +1,22 @@
-import React, {useState , useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { PlusOutlined ,  SmileOutlined , FrownOutlined,} from '@ant-design/icons';
 import {Button , Avatar, Switch, Message} from 'antd';
 import ProTable from '@ant-design/pro-table';
 import {GetGoodList , GoodsIsArrival , GoodsIsRecommend} from "@/services/goodlist/goodlist";
 import AddGoods from "@/pages/GoodsList/components/AddGoods";
 import { PageContainer } from '@ant-design/pro-layout';
+import {GetCategoryList} from "@/services/category/category";
+
 
 const GoodsList = () => {
 
   const [isCreateGoods,setIsCreateGoods] =useState (false);
+  const [isEditGoods,setIsEditGoods] = useState(false)
   const actionRef = useRef(null);
+  const [list,setList] = useState(null)
 
-const GetGoods = async (params) => {
+
+  const GetGoods = async (params) => {
   const data = await GetGoodList(params)
   return {
     data: data.data,
@@ -19,6 +24,14 @@ const GetGoods = async (params) => {
     total:data.meta.pagination.total,
   }
 }
+
+  useEffect(async () => {
+    const data = await GetCategoryList(1);
+    if (data.status === undefined){
+      setList(data);
+    }
+  },[])
+
 
 const isArrival = async (params) => {
   await GoodsIsArrival(params).then(()=>{
@@ -38,6 +51,10 @@ const isRecommend = async (params) => {
 
 const isShowModel = (params: boolean) => {
   setIsCreateGoods(params);
+}
+
+const isShowEdit = (id,params) => {
+    console.log(id,params)
 }
 
 // @ts-ignore
@@ -131,6 +148,10 @@ const columns = [
     valueType: 'date',
     hideInSearch: true,
   },
+  {
+    title: '操作',
+    render:(_,record) => <Button onClick={() => isShowEdit(record.id,true)}>修改</Button>
+  }
 ];
 
 
@@ -161,6 +182,7 @@ const columns = [
          isCreateGoods={isCreateGoods}
          actionRef={actionRef}
          isShowModel={isShowModel}
+         list={list}
        />
      </PageContainer>
   );

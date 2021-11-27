@@ -33,8 +33,25 @@ export const GoodsIsRecommend = async (params) => {
  * 添加商品
  * */
 export const AddGoodsA = async (params) => {
-  return await request('/api/admin/goods',{
-    method:'POST'
+  return await request('/api/admin/goods', {
+    method: 'POST',
+    params
   })
 }
 
+/**
+ * 获取商品详情
+ * */
+export const GetGoodsDetail = async (id) => {
+  return await request(`/api/admin/goods/${id}`)
+}
+
+/**
+ * 修改商品
+ * */
+export const EditGoddsMessage = async (params,id) => {
+  return await request(`/api/admin/goods/${id}`,{
+    method:'PUT',
+    params
+  })
+}

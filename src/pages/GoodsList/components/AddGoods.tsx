@@ -1,24 +1,35 @@
 import React from 'react';
-import {Modal , Message , TreeSelect} from 'antd';
+import {Modal , Message , Button , Cascader} from 'antd';
 import {AddGoodsA} from "@/services/goodlist/goodlist";
-import {GetCategoryList} from "@/services/category/category";
-import ProForm, {ProFormText , ProFormMoney , ProFormTextArea, ProFormDigit} from '@ant-design/pro-form';
+import {UploadOutlined} from "@ant-design/icons";
+import UpFileOss from "@/components/UpFileOss";
+import ProForm, {ProFormText , ProFormMoney , ProFormDigit} from '@ant-design/pro-form';
+import Editor from "@/components/Editor";
+
+
 
 const AddGoods = (props) => {
 
-  const {isCreateGoods,actionRef,isShowModel} = props
+  const {isCreateGoods,actionRef,isShowModel,list} = props
+
+  const [formObj] = ProForm.useForm();
+
+  const setCoverKey = (fileKey) => formObj.setFieldsValue({'cover': fileKey})
+
+  const setDetails = (content) => formObj.setFieldsValue({'details':content})
+
 
   const UpData = async (params) => {
-    await console.log(params);
+    console.log(params)
+    await AddGoodsA(params).then(()=>{
+      Message.success('添加成功');
+      actionRef.current.reload();
+      isShowModel(false);
+    }).catch((e)=>{
+      Message.error('添加失败'+e);
+    })
   }
 
-  const GetCategory = async (params) => {
-    const data = await GetCategoryList(params);
-    return {
-      success:true,
-      ...data
-    }
-  }
 
   return (
       <Modal
@@ -29,7 +40,8 @@ const AddGoods = (props) => {
         onCancel={() => isShowModel(false)}
       >
         <ProForm
-          onFinish={(values) => UpData(values)}
+          onFinish={async (values) => UpData(values)}
+          form={formObj}
         >
           <ProFormText
             name="title"
@@ -57,10 +69,51 @@ const AddGoods = (props) => {
               {type:"number",message:"输入的不是数字"}
             ]}
           />
-          <ProFormTextArea
-            name="details"
-            label="商品介绍"
+          <ProForm.Item
+            name='category_id'
+            label='分类'
+            rules={[
+              {required: true, message: '请选择商品名'}
+            ]}
+          >
+            <Cascader
+              options={list}
+              fieldNames={{
+                label: 'name',
+                value: 'id'
+              }}
+              placeholder='选择商品分类'
+            />
+          </ProForm.Item>
+          <ProForm.Item
+            name='cover'
+            label='商品图片'
+            rules={[
+              {required: true, message: '上传商品图片'}
+            ]}
+          >
+            <div>
+              <UpFileOss
+                accept='image/*'
+                setCoverKey={setCoverKey}
+                showUploadList={true}
+              >
+                <Button icon={<UploadOutlined/>}>上传图片</Button>
+              </UpFileOss>
+            </div>
+          </ProForm.Item>
+
+        <ProForm.Item
+          name="details"
+          label="商品介绍"
+          rules={[
+            {required:true,message:'请上传商品详情'}
+          ]}
+        >
+          <Editor
+            setDetails={setDetails}
           />
+        </ProForm.Item>
         </ProForm>
       </Modal>
   );
