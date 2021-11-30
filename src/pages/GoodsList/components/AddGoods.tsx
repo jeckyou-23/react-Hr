@@ -18,24 +18,23 @@ const AddGoods = (props) => {
 
   const setDetails = (content) => formObj.setFieldsValue({'details':content})
 
-
   const UpData = async (params) => {
-    console.log(params)
-    await AddGoodsA(params).then(()=>{
+    const response = await AddGoodsA({...params,category_id: params.category_id[1]})
+    if (response.status == undefined){
       Message.success('添加成功');
       actionRef.current.reload();
       isShowModel(false);
-    }).catch((e)=>{
-      Message.error('添加失败'+e);
-    })
+    }else {
+      Message.error('添加失败');
+    }
   }
 
-
   return (
+    <div>
       <Modal
+        destroyOnClose={true}
         footer={null}
         title = '添加商品'
-        destroyOnClose={true}
         visible={isCreateGoods}
         onCancel={() => isShowModel(false)}
       >
@@ -103,19 +102,20 @@ const AddGoods = (props) => {
             </div>
           </ProForm.Item>
 
-        <ProForm.Item
-          name="details"
-          label="商品介绍"
-          rules={[
-            {required:true,message:'请上传商品详情'}
-          ]}
-        >
-          <Editor
-            setDetails={setDetails}
-          />
-        </ProForm.Item>
+          <ProForm.Item
+            name="details"
+            label="商品介绍"
+            rules={[
+              {required:true,message:'请上传商品详情'}
+            ]}
+          >
+            <Editor
+              setDetails={setDetails}
+            />
+          </ProForm.Item>
         </ProForm>
       </Modal>
+    </div>
   );
 };
 

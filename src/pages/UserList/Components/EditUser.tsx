@@ -17,7 +17,7 @@ const EditUser = (props) => {
   },[])
 //提交修改操作
 const Edit = async (params) => {
-  await EditUsers(params , userId).then(
+  await  EditUsers(params , userId).then(
       ()=>{
         Message.success('修改成功')
         //刷新表格数据

@@ -7,27 +7,19 @@ import { ContentUtils } from 'braft-utils'
 import {UploadOutlined} from "@ant-design/icons";
 
 class Editor extends Component {
-
   state = {
     // 创建一个空的editorState作为初始值
-    editorState: BraftEditor.createEditorState(null)
+    editorState: BraftEditor.createEditorState(this.props.content ?? null)
   }
 
-  // async componentDidMount () {
-  //   // 假设此处从服务端获取html格式的编辑器内容
-  //   const htmlContent = await fetchEditorContent()
-  //   // 使用BraftEditor.createEditorState将html字符串转换为编辑器需要的editorStat
-  //   this.setState({
-  //     editorState: BraftEditor.createEditorState(htmlContent)
-  //   })
-  // }
 
   handleEditorChange = (editorState) => {
-    this.setState({ editorState })
+    this.setState({ editorState })
     if (editorState.isEmpty()){
-      this.props.setDetails('')
+      this.props.setDetails('');
     }
-    this.props.setDetails(editorState.toHTML())
+    this.props.setDetails(editorState.toHTML());
+
   }
 
   insertImage = url => {
@@ -40,7 +32,6 @@ class Editor extends Component {
   }
 
   render() {
-    const { editorState } = this.state
 
     const extendControls = [
       {
@@ -59,13 +50,15 @@ class Editor extends Component {
         )
       }
     ]
-
+    const { editorState } = this.state
     return (
-      <BraftEditor
-        value={editorState}
-        onChange={this.handleEditorChange}
-        extendControls={extendControls}
-      />
+      <div className="my-editor">
+        <BraftEditor
+         value={editorState}
+         onChange={this.handleEditorChange}
+         extendControls={extendControls}
+        />
+      </div>
     );
   }
 }

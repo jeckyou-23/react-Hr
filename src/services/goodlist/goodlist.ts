@@ -43,13 +43,15 @@ export const AddGoodsA = async (params) => {
  * 获取商品详情
  * */
 export const GetGoodsDetail = async (id) => {
-  return await request(`/api/admin/goods/${id}`)
+  return await request(`/api/admin/goods/${id}?include=category`,{
+    method:'GET',
+  })
 }
 
 /**
  * 修改商品
  * */
-export const EditGoddsMessage = async (params,id) => {
+export const EditGoodsMessage = async (params,id) => {
   return await request(`/api/admin/goods/${id}`,{
     method:'PUT',
     params

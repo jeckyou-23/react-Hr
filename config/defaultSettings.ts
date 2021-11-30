@@ -12,7 +12,7 @@ const Settings: LayoutSettings & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '飓风书城',
+  title: '融职书城',
   pwa: false,
   logo: 'https://www.eduwork.cn/images/logo.png',
   iconfontUrl: '',

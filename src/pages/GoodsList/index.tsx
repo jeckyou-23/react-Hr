@@ -6,14 +6,16 @@ import {GetGoodList , GoodsIsArrival , GoodsIsRecommend} from "@/services/goodli
 import AddGoods from "@/pages/GoodsList/components/AddGoods";
 import { PageContainer } from '@ant-design/pro-layout';
 import {GetCategoryList} from "@/services/category/category";
+import EditGoods from "@/pages/GoodsList/components/EditGoods";
 
 
 const GoodsList = () => {
 
+  const actionRef = useRef();
   const [isCreateGoods,setIsCreateGoods] =useState (false);
-  const [isEditGoods,setIsEditGoods] = useState(false)
-  const actionRef = useRef(null);
-  const [list,setList] = useState(null)
+  const [isEditGoods,setIsEditGoods] = useState(false);
+  const [isUserId,setIsUserId] = useState(null);
+  const [list,setList] = useState(null);
 
 
   const GetGoods = async (params) => {
@@ -54,7 +56,8 @@ const isShowModel = (params: boolean) => {
 }
 
 const isShowEdit = (id,params) => {
-    console.log(id,params)
+    setIsEditGoods(params);
+    setIsUserId(id);
 }
 
 // @ts-ignore
@@ -159,6 +162,7 @@ const columns = [
      <PageContainer>
        <ProTable
          columns={columns}
+         actionRef={actionRef}
          request={async (params ) =>GetGoods(params)}
          rowKey="id"
          search={{
@@ -178,12 +182,29 @@ const columns = [
            </Button>,
          ]}
        />
-       <AddGoods
-         isCreateGoods={isCreateGoods}
-         actionRef={actionRef}
-         isShowModel={isShowModel}
-         list={list}
-       />
+       {
+         isCreateGoods ?
+         <AddGoods
+           isCreateGoods={isCreateGoods}
+           actionRef={actionRef}
+           isShowModel={isShowModel}
+           list={list}
+         />
+           : ''
+       }
+
+       {
+         isEditGoods ?
+           <EditGoods
+             isEditGoods={isEditGoods}
+             actionRef={actionRef}
+             isUserId={isUserId}
+             isShowEdit={isShowEdit}
+             list={list}
+           />
+           : ''
+       }
+
      </PageContainer>
   );
 };

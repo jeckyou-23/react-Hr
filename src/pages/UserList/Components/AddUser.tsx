@@ -21,12 +21,12 @@ const AddUser = (props) => {
   // @ts-ignore
   return (
     <Modal
-      destroyOnClose={true}
       title = "添加用户"
       footer = {null}
       visible = {isShowCreateModel}
       onCancel = {() => isShowClick(false)}
-     >
+      destroyOnClose={true}
+    >
       <ProForm
         onFinish={(values) => CreateUser(values)}
       >
