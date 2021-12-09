@@ -3,17 +3,19 @@ import {PlusOutlined,UserOutlined} from '@ant-design/icons';
 import { Button, Switch,Message ,Avatar } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { GitUserList , ChangeLock } from '@/services/userlist/userlist';
-import AddUser from "@/pages/UserList/Components/AddUser";
-import EditUser from '@/pages/UserList/Components/EditUser';
+import EditOrAdd from '@/pages/UserList/Components/EditOrAdd';
 import { PageContainer } from '@ant-design/pro-layout';
+
 
 const UserList = () => {
 
   //定义模态框是否显示状态
-  const [isShowCreateModel,setIsShowCreateModel] = useState(false);
   const [isShowEditModel,setIsShowEditModel] = useState(false);
   const [userId,setUserId] = useState(undefined);
   const actionRef = useRef(null);
+  const [type,setType] = useState<'add'|'edit'>('add')
+
+
 
   //获取列表数据
   const getData = async (params) => {
@@ -24,13 +26,10 @@ const UserList = () => {
       total: response.meta.pagination.total
     }
   }
-  //是否显示添加用户model
-  const isShowClick = (show) => {
-    setIsShowCreateModel(show)
-  }
   const isShowEdit = (show,id) => {
     setIsShowEditModel(show)
     setUserId(id)
+    setType('edit')
   }
   //更改状态时间lock
 const lock = async (params) => {
@@ -89,10 +88,6 @@ const columns = [
         actionRef={actionRef}
         request={(params) => getData(params)}
         rowKey="id"
-        columnsState={ {
-          persistenceKey: 'pro-table-singe-demos',
-          persistenceType: 'localStorage',
-        } }
         search={{
           labelWidth: 'auto',
           resetText:"重置"
@@ -106,23 +101,19 @@ const columns = [
         dateFormatter="string"
         headerTitle="用户管理"
         toolBarRender={() => [
-          <Button key="button" icon={<PlusOutlined />} type="primary" onClick={()=>isShowClick(true)}>
+          <Button key="button" icon={<PlusOutlined />} type="primary" onClick={()=>setIsShowEditModel(true)}>
             新建
           </Button>
         ]}
       />
-      <AddUser
-        isShowCreateModel = {isShowCreateModel}
-        isShowClick = {isShowClick}
-        actionRef={actionRef}
-      />
         {
-          userId ?
-          <EditUser
+          isShowEditModel ?
+          <EditOrAdd
             isShowEditModel = {isShowEditModel}
+            setIsShowEditModel={(bool) => setIsShowEditModel(bool)}
             userId = {userId}
-            isShowEdit = {isShowEdit}
             actionRef = {actionRef}
+            type={type}
           /> : undefined
         }
 

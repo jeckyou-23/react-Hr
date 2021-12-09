@@ -9,7 +9,7 @@ import {UploadOutlined} from "@ant-design/icons";
 class Editor extends Component {
   state = {
     // 创建一个空的editorState作为初始值
-    editorState: BraftEditor.createEditorState(this.props.content ?? null)
+    editorState: BraftEditor.createEditorState(this.props.content ? this.props.content : null)
   }
 
 

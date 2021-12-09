@@ -22,7 +22,7 @@
     ],
   },
   {
-    path: '/',
+    path: '/index ',
     name: 'home',
     icon:'SmileTwoTone',
     component: './Index'

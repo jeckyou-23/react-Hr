@@ -3,7 +3,7 @@ import {request} from 'umi';
 /**
  * 获取商品列表
  * */
-export const GetGoodList = async (params) => {
+export const getGoodList = async (params) => {
   return await request('/api/admin/goods',{
     method:'GET',
     params
@@ -13,7 +13,7 @@ export const GetGoodList = async (params) => {
 /**
  * 商品上架下架
  * */
-export const GoodsIsArrival = async (params) => {
+export const goodsIsArrival = async (params) => {
   return await request(`/api/admin/goods/${params}/on`,{
     method:'PATCH',
   })
@@ -23,7 +23,7 @@ export const GoodsIsArrival = async (params) => {
 /**
  * 商品是否推荐
  * */
-export const GoodsIsRecommend = async (params) => {
+export const goodsIsRecommend = async (params) => {
   return await request(`/api/admin/goods/${params}/recommend`,{
     method:'PATCH'
   })
@@ -32,7 +32,7 @@ export const GoodsIsRecommend = async (params) => {
 /**
  * 添加商品
  * */
-export const AddGoodsA = async (params) => {
+export const addGoodsA = async (params) => {
   return await request('/api/admin/goods', {
     method: 'POST',
     params
@@ -42,7 +42,7 @@ export const AddGoodsA = async (params) => {
 /**
  * 获取商品详情
  * */
-export const GetGoodsDetail = async (id) => {
+export const getGoodsDetail = async (id) => {
   return await request(`/api/admin/goods/${id}?include=category`,{
     method:'GET',
   })
@@ -51,7 +51,7 @@ export const GetGoodsDetail = async (id) => {
 /**
  * 修改商品
  * */
-export const EditGoodsMessage = async (params,id) => {
+export const editGoodsMessage = async (params,id) => {
   return await request(`/api/admin/goods/${id}`,{
     method:'PUT',
     params

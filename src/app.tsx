@@ -82,7 +82,7 @@ const requestInterceptors = (url: string,options: RequestOptionsInit) => {
   const urlStatus: boolean =  url.indexOf('//') == -1 ? true : false
 
   const baseurl: string =  urlStatus ? [API_URL] + url : url;
-  const c_token = localStorage.getItem('token') ? localStorage.getItem('token') : '';
+  const c_token = localStorage.getItem('token') ?? '';
   if(c_token){
     const headers = {
       'Content-Type': 'application/json',

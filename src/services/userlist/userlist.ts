@@ -18,7 +18,7 @@ export const GitUserList = async (params) => {
  *@params: email type:string 用户邮箱
  *@params: password type:string 用户密码
  * */
-export const AddUsers = async (params) => {
+export const addUsers = async (params) => {
   return request('/api/admin/users',{
     method: 'POST',
     params
@@ -35,7 +35,7 @@ export const ChangeLock = async (params) => {
 /**
  * 修改用户数据
  * */
-export const EditUsers = async (params , userId) => {
+export const editUsers = async (params , userId) => {
   return request(`/api/admin/users/${userId}`,{
     method: 'PUT',
     params
@@ -44,7 +44,7 @@ export const EditUsers = async (params , userId) => {
 /**
  * 获取用户详情
  * */
-export const ShowUserDetails = async(params) => {
+export const showUserDetails = async(params) => {
   return request(`/api/admin/users/${params}`,{
     method: 'GET'
   })
