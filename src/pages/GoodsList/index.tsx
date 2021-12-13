@@ -1,10 +1,9 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef} from 'react';
 import { PlusOutlined ,  SmileOutlined , FrownOutlined,} from '@ant-design/icons';
-import {Button , Avatar, Switch, Message} from 'antd';
+import {Button , Avatar, Switch, message} from 'antd';
 import ProTable from '@ant-design/pro-table';
 import {getGoodList , goodsIsArrival , goodsIsRecommend} from "@/services/goodlist/goodlist";
 import { PageContainer } from '@ant-design/pro-layout';
-import {getCategoryList} from "@/services/category/category";
 import AddOrEdit from "@/pages/GoodsList/components/AddOrEdit";
 
 
@@ -12,12 +11,10 @@ const GoodsList = () => {
 
   const actionRef = useRef();
   const [addEdit,setAddEdit] = useState<boolean>(false)
-  const [isGoodsId,setIsGoodsId] = useState(undefined);
-  const [list,setList] = useState(null);
-  const [type, setType] = useState<'add' | 'edit'>('add')
+  const [isGoodsId,setIsGoodsId] = useState(null);
 
-  const getGoods = async (params) => {
-  const data = await getGoodList(params)
+  const getGoods = async () => {
+  const data = await getGoodList()
   return {
     data: data.data,
     success:true,
@@ -25,27 +22,20 @@ const GoodsList = () => {
   }
 }
 
-  useEffect(async () => {
-    const data = await getCategoryList(1);
-    if (data.status === undefined){
-      setList(data);
-    }
-  },[])
-
 
 const isArrival = async (params) => {
   await goodsIsArrival(params).then(()=>{
-    Message.success('修改成功')
+    message.success('修改成功')
   }).catch((e)=>{
-    Message.error('修改失败'+e)
+    message.error('修改失败'+e)
   })
 }
 
 const isRecommend = async (params) => {
   await goodsIsRecommend(params).then(()=>{
-    Message.success('修改成功')
+    message.success('修改成功')
   }).catch((e)=>{
-    Message.error('修改失败'+e)
+    message.error('修改失败'+e)
   })
 }
 
@@ -53,7 +43,6 @@ const isRecommend = async (params) => {
 const isShow = (id,params) => {
     setIsGoodsId(id);
     setAddEdit(params);
-    setType('edit')
 }
 
 // @ts-ignore
@@ -160,7 +149,7 @@ const columns = [
        <ProTable
          columns={columns}
          actionRef={actionRef}
-         request={async (params ) =>getGoods(params)}
+         request={async (params ) =>getGoods()}
          rowKey="id"
          search={{
            labelWidth: 'auto',
@@ -176,7 +165,7 @@ const columns = [
          toolBarRender={() => [
            <Button key="button" icon={<PlusOutlined />} type="primary" onClick={() =>  {
              setAddEdit(true)
-             setType("add")
+             setIsGoodsId(null)
            } }>
              新建
            </Button>,
@@ -187,11 +176,8 @@ const columns = [
          <AddOrEdit
            actionRef={actionRef}
            addEdit={addEdit}
-           setAddEdit={(bool) => setAddEdit(bool)}
-           type={type}
-           list={list}
+           setAddEdit={setAddEdit}
            isGoodsId={isGoodsId}
-           setIsGoodsId={setIsGoodsId}
          />
        }
 

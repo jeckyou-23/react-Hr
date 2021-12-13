@@ -3,9 +3,9 @@ import {request} from 'umi';
 /**
  * 获取图片列表
  * */
-export const getCarouselList = async (params) => {
+export const getCarouselList = async () => {
   return await request('/api/admin/slides',{
-    params
+
   })
 }
 
@@ -13,34 +13,45 @@ export const getCarouselList = async (params) => {
  * 状态的启用和禁用
  * */
 export const updateStatus = async (id) => {
-  return await request(`/api/admin/slides/${id}/status`)
+  return await request(`/api/admin/slides/${id}/status`,{
+    method:'PATCH'
+  })
 }
 
 /**
  * 添加图片
  * */
-export const upImageBanner = async (params) => {
+export const upImageBanner = async (data) => {
   return await request('/api/admin/slides',{
     method:'POST',
-    params
+    data
   })
 }
 
 /**
  * 修改轮播
  * */
-export const updateBanner = async (id,params) => {
+export const updateBanner = async (id,data) => {
   return await request(`/api/admin/slides/${id}`,{
     method:'PUT',
-    params
+    data
   })
 }
 
 /**
  * 获取轮播详情
  * */
-export const BannerDetail = async (id) => {
+export const bannerDetail = async (id) => {
   return await request(`/api/admin/slides/${id}`,{
     method:'GET'
+  })
+}
+
+/**
+ * 删除轮播图
+ * */
+export const deleteBanner = async (id) => {
+  return await request(`/api/admin/slides/${id}`,{
+    method:'DELETE'
   })
 }

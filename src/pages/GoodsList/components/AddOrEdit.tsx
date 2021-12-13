@@ -1,9 +1,10 @@
 import React, {FC, useEffect, useState} from 'react';
-import { message, Skeleton, Cascader, Button, Image , Space} from 'antd';
-import {getGoodsDetail, editGoodsMessage, addGoodsA} from "@/services/goodlist/goodlist";
+import { message, Skeleton, Cascader, Button, Image , Space, Modal} from 'antd';
+import {getGoodsDetail, editGoods, addGoodsA} from "@/services/goodlist/goodlist";
+import {getCategoryList} from "@/services/category/category";
 import {UploadOutlined} from "@ant-design/icons";
 import UpFileOss from "@/components/UpFileOss";
-import ProForm, {ModalForm, ProFormText, ProFormMoney, ProFormDigit} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ProFormMoney, ProFormDigit} from '@ant-design/pro-form';
 import Editor from "@/components/Editor";
 
 //设定props类型
@@ -11,15 +12,12 @@ interface Props {
   addEdit: boolean,
   actionRef: any,
   setAddEdit: (bool) => void,
-  list: any,
   isGoodsId: any,
-  type: 'add' | 'edit',
-  setIsGoodsId: any,
 }
 
 const AddOrEdit:FC<Props> = (props) => {
 
-  const {actionRef, addEdit, setAddEdit, list, isGoodsId, type, setIsGoodsId } = props;
+  const {actionRef, addEdit, setAddEdit, isGoodsId } = props;
 
   const setCoverKey = (fileKey) => formObj.setFieldsValue({'cover': fileKey})
 
@@ -27,59 +25,69 @@ const AddOrEdit:FC<Props> = (props) => {
 
   const [initialValues, setInitialValues] = useState<any>({});
 
+  const [categoryList, setCategoryList] = useState([])
+
+  const [isShowFormDate,setIsShowFormDate] = useState(false);
+
   const [formObj] = ProForm.useForm();
 
-  useEffect(() => {
-    if (type === 'add'){
-      setIsGoodsId(undefined)
-      return
-    }
-    if (!isGoodsId) return
-    if (!addEdit) return
-    (async () => {
+  useEffect( async () => {
+    if (isGoodsId != null){
       const data = await getGoodsDetail(isGoodsId);
       const {id, pid} = data.category
       setInitialValues({
         ...data,
         category_id: pid ? [pid, id] : [id]
       })
-    })()
-  }, [isGoodsId, type, addEdit])
+      setIsShowFormDate(true);
+    }else{
+      setIsShowFormDate(true);
+    }
+  }, [])
 
-  const Goods = (value :any) => {
-    if(type === 'add') {
-      addGoodsA(value).then(
-        () => {
-          message.success('添加成功')
+  useEffect(async ()=>{
+    const data = await getCategoryList();
+    setCategoryList(data);
+  },[])
+
+
+
+  const goodsAction = async (value :any,id) => {
+    if (id){
+
+     const res = await editGoods({...value, category_id: [...value.category_id].pop()},id)
+      if (res.status === 204) {
+            message.success('修改成功');
+            actionRef.current.reload();
+            setAddEdit(false);
+          }
+    }else{
+      const res = await addGoodsA({...value, category_id:[...value.category_id].pop()})
+        if (res.status === undefined) {
+          message.success('添加成功');
           actionRef.current.reload();
           setAddEdit(false);
         }
-        )
-    }else{
-      editGoodsMessage(value,isGoodsId).then(()=>{
-        message.success('修改成功');
-        actionRef.current.reload();
-        setAddEdit(false);
-      })
     }
+
   }
 
   return (
     <Space>
-
+      <Modal
+        visible = {addEdit}
+        onCancel = {()=>setAddEdit(false)}
+        destroyOnClose={true}
+        footer={null}
+        title={isGoodsId ? '修改商品' : '添加商品'}
+      >
       {
-        initialValues && !Object.entries(initialValues).length && type === 'edit' ? <Skeleton active/> :
-          <ModalForm
-            title={type === 'add' ? '添加商品' : '修改商品'}
-            width={800}
-            form={formObj}
-            visible={addEdit}
-            initialValues={type === 'edit' ? initialValues : void 0}
-            modalProps={{
-              onCancel: () => setAddEdit(false)
-            }}
-            onFinish={(value: any) => Goods(value)}
-          >
+        isShowFormDate ?
+        <ProForm
+          form={formObj}
+          initialValues={initialValues}
+          onFinish={(value) => goodsAction(value,isGoodsId)}
+        >
             <ProFormText
               name="title"
               label="商品名称"
@@ -93,7 +101,7 @@ const AddOrEdit:FC<Props> = (props) => {
               ]}
             >
               <Cascader
-                options={list}
+                options={categoryList}
                 fieldNames={{
                   label: 'name',
                   value: 'id'
@@ -158,10 +166,10 @@ const AddOrEdit:FC<Props> = (props) => {
                 content={initialValues?.details}
               />
             </ProForm.Item>
-
-
-          </ModalForm>
+            </ProForm>
+          : <Skeleton active />
       }
+      </Modal>
     </Space>
   );
 };

@@ -1,21 +1,19 @@
 import React, {useRef , useState} from 'react';
-import {getCarouselList , updateStatus} from '@/services/carousel/carousel'
+import {getCarouselList , updateStatus , deleteBanner} from '@/services/carousel/carousel'
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import {Avatar, Button, Switch, message} from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import AddBanner from "@/pages/Carousel/components/AddBanner";
-import UpdateBanner from "@/pages/Carousel/components/UpdateBanner";
+import BannerAction from "@/pages/Carousel/components/BannerAction";
 
 const Carousel = () => {
 
   const actionRef = useRef()
-  const [isCreateBanner,setIsCreateBanner] = useState(false)
-  const [isUpdateBanner,setIsUpdateBanner] = useState(false)
-  const [isBannerId,setIsBannerId] = useState(undefined)
+  const [isActionBanner,setIsActionBanner] = useState(false)
+  const [isBannerId,setIsBannerId] = useState(null)
 
-  const getCarousel = async (params) => {
-    const response = await getCarouselList(params);
+  const getCarousel = async () => {
+    const response = await getCarouselList();
     if (response.status === undefined) {
       return {
         data:response.data,
@@ -25,23 +23,28 @@ const Carousel = () => {
     }
   }
 
-  const isArrival = (id) => {
-    updateStatus(id).then((res)=>{
-      if(res.status === undefined) {
-        message.success('修改成功')
-      }
-    }).catch(()=>{
+  const isArrival = async (id) => {
+    const response = await updateStatus(id);
+    if (response.status === undefined) {
+      message.success('修改成功')
+    }else {
       message.error('修改失败')
-    })
+    }
   }
 
-  const updateDate = (id,params) => {
+  const deleteData = async (id) => {
+    const response = await deleteBanner(id);
+    if (response.status === undefined) {
+      message.success('修改成功')
+      actionRef.current.reload();
+    }else {
+      message.error('修改失败')
+    }
+  }
+
+  const bannerAction = (id,params) => {
     setIsBannerId(id)
-    setIsUpdateBanner(params)
-  }
-
-  const createModal = (params) => {
-    setIsCreateBanner(params)
+    setIsActionBanner(params)
   }
 
   const columns = [
@@ -94,7 +97,13 @@ const Carousel = () => {
     {
       title:'编辑',
       hideInSearch: true,
-      render:(_,record)=><Button onClick={()=>updateDate(record.id,true)}>编辑</Button>
+      render:(_,record)=><Button onClick={()=>bannerAction(record.id,true)}>编辑</Button>
+
+    },
+    {
+      title:'删除',
+      hideInSearch: true,
+      render:(_,record) => <Button danger onClick={() => deleteData(record.id)}>删除</Button>
     }
   ];
 
@@ -104,7 +113,7 @@ const Carousel = () => {
         <ProTable
           columns={columns}
           actionRef={actionRef}
-          request={(params) => getCarousel(params)}
+          request={() => getCarousel()}
           rowKey="id"
           search={{
             labelWidth: 'auto',
@@ -119,31 +128,24 @@ const Carousel = () => {
           dateFormatter="string"
           headerTitle="轮播图管理"
           toolBarRender={() => [
-            <Button key="button" icon={<PlusOutlined />} type="primary" onClick={() => createModal(true)}>
+            <Button key="button" icon={<PlusOutlined />} type="primary" onClick={() => setIsActionBanner(true)}>
               新建
             </Button>,
           ]}
         >
         </ProTable>
+
         {
-          isCreateBanner ?
-            <AddBanner
-              isCreateBanner={isCreateBanner}
-              actionRef={actionRef}
-              createModal={createModal}
-            />
-            : ''
+          isActionBanner ?
+          <BannerAction
+            isBannerId={isBannerId}
+            actionRef={actionRef}
+            setIsActionBanner={setIsActionBanner}
+            isActionBanner={isActionBanner}
+          />
+            : undefined
         }
-        {
-          isBannerId ?
-            <UpdateBanner
-              isUpdateBanner={isUpdateBanner}
-              isBannerId={isBannerId}
-              updateDate={updateDate}
-              actionRef={actionRef}
-            />
-        : ''
-        }
+
       </PageContainer>
     </div>
   );

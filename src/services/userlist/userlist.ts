@@ -6,10 +6,9 @@ import {request} from 'umi';
  * @params: name type:string    姓名模糊搜索
  * @params: email type:string   邮箱模糊搜索
  * */
-export const GitUserList = async (params) => {
+export const GitUserList = async () => {
   return request('/api/admin/users',{
-    method: 'GET',
-    params
+    method: 'GET'
   })
 }
 /**
@@ -18,34 +17,34 @@ export const GitUserList = async (params) => {
  *@params: email type:string 用户邮箱
  *@params: password type:string 用户密码
  * */
-export const addUsers = async (params) => {
+export const addUsers = async (data) => {
   return request('/api/admin/users',{
     method: 'POST',
-    params
+    data
   })
 }
 /**
  * 更改用户状态 禁用和启用
  * */
-export const ChangeLock = async (params) => {
-  return request(`/api/admin/users/${params}/lock`,{
+export const ChangeLock = async (id) => {
+  return request(`/api/admin/users/${id}/lock`,{
     method: 'PATCH'
   })
 }
 /**
  * 修改用户数据
  * */
-export const editUsers = async (params , userId) => {
+export const editUsers = async (data , userId) => {
   return request(`/api/admin/users/${userId}`,{
     method: 'PUT',
-    params
+    data
   })
 }
 /**
  * 获取用户详情
  * */
-export const showUserDetails = async(params) => {
-  return request(`/api/admin/users/${params}`,{
+export const showUserDetails = async(id) => {
+  return request(`/api/admin/users/${id}`,{
     method: 'GET'
   })
 }

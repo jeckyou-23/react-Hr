@@ -1,11 +1,13 @@
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
 import type { RunTimeLayoutConfig } from 'umi';
-import { history , RequestConfig} from 'umi';
+import { history , RequestConfig } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import  {notification} from 'antd';
+import { RequestOptionsInit} from "umi-request";
+
 // const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -100,6 +102,25 @@ const requestInterceptors = (url: string,options: RequestOptionsInit) => {
   };
 }
 
+const successMap = {
+  200: '',
+  201: '',
+  204: ''
+}
+
+const responseInterceptors = async (response: Response, options: RequestOptionsInit) => {
+  if (options?.useStatus && Object.keys(successMap).includes(String(response.status))) {
+    let data: any
+    try {
+      data = await response.clone().json()
+    } catch (e) {
+      data = {}
+    }
+    return { status: response.status, ...data }
+  }
+  return response
+}
+
 //错误处理
 const errorHandler = (error: any) => {
   const { response,data } = error;
@@ -143,5 +164,6 @@ export const request: RequestConfig = {
   errorHandler,
   middlewares:[],
   requestInterceptors: [requestInterceptors],
+  responseInterceptors: [responseInterceptors]
 }
 

@@ -11,10 +11,8 @@ const UserList = () => {
 
   //定义模态框是否显示状态
   const [isShowEditModel,setIsShowEditModel] = useState(false);
-  const [userId,setUserId] = useState(undefined);
+  const [userId,setUserId] = useState(null);
   const actionRef = useRef(null);
-  const [type,setType] = useState<'add'|'edit'>('add')
-
 
 
   //获取列表数据
@@ -29,7 +27,6 @@ const UserList = () => {
   const isShowEdit = (show,id) => {
     setIsShowEditModel(show)
     setUserId(id)
-    setType('edit')
   }
   //更改状态时间lock
 const lock = async (params) => {
@@ -107,13 +104,12 @@ const columns = [
         ]}
       />
         {
-          isShowEditModel ?
+          isShowEditModel  ?
           <EditOrAdd
             isShowEditModel = {isShowEditModel}
-            setIsShowEditModel={(bool) => setIsShowEditModel(bool)}
+            setIsShowEditModel={setIsShowEditModel}
             userId = {userId}
             actionRef = {actionRef}
-            type={type}
           /> : undefined
         }
 

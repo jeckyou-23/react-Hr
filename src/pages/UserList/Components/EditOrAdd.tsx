@@ -6,47 +6,52 @@ import ProForm, {ProFormText} from "@ant-design/pro-form";
 interface props {
   isShowEditModel: boolean,
   setIsShowEditModel: (bool) => void,
-  type: 'add' | 'edit',
   actionRef: any,
   userId: bigint
 }
 
 const EditOrAdd:FC<props> = (props) => {
-  const {isShowEditModel , setIsShowEditModel, type , actionRef , userId} = props
-  const [initialValues,setInitialValues] = useState(undefined);
+  const {isShowEditModel , setIsShowEditModel , actionRef , userId} = props
+  const [initialValues,setInitialValues] = useState({});
+  const [isUserDataInfo,setIsUserDataInfo] = useState(false);
   //当组件被挂载的时候获取用户的详细信息
 
-    useEffect( () => {
-      if(type === 'add' ) {
-        setInitialValues(undefined)
-        return
-      }
-      if(!userId) return
-      if(!isShowEditModel) return
-      (async () => {
-        const data = await showUserDetails(userId)
+  console.log(userId)
+
+    useEffect(async () => {
+
+      if (userId != null) {
+        const data = await showUserDetails(userId);
         setInitialValues({
           name: data.name,
           email: data.email
         })
-      })()
-    },[type,userId,isShowEditModel])
+        setIsUserDataInfo(true);
+      }else{
+        setIsUserDataInfo(true)
+      }
+
+    },[])
 
 
 //提交修改操作
-const editOrAdd = (params) => {
-      type === 'add' ?
-         addUsers(params).then(()=>{
-           message.success('添加成功');
-           actionRef.current.reload();
-           setIsShowEditModel(false);
-         })
-        :
-        editUsers(params,userId).then(()=>{
+const editOrAdd = async (params,id) => {
+      if (id) {
+        const res = await editUsers(params,id);
+        if (res.status === 204)
           message.success('修改成功');
           actionRef.current.reload();
           setIsShowEditModel(false);
-        })
+
+      }else{
+      const res = await  addUsers(params);
+        if (res.status === undefined)
+          message.success('添加成功');
+          actionRef.current.reload();
+          setIsShowEditModel(false);
+      }
+
+
 }
 
 
@@ -58,12 +63,12 @@ const editOrAdd = (params) => {
           onCancel = {()=>setIsShowEditModel(false)}
           destroyOnClose={true}
           footer={null}
-          title={type === 'add' ? '添加用户' : '修改用户'}
+          title={userId ? '修改用户' : '添加用户'}
         >
-          { initialValues && !Object.entries(initialValues).length &&  type === 'edit' ?   <Skeleton active paragraph /> :
+          { isUserDataInfo ?
           <ProForm
-            initialValues = {type === 'edit' ? initialValues : void 0}
-            onFinish = {(values)=>editOrAdd(values)}
+            initialValues = {initialValues}
+            onFinish = {(values)=>editOrAdd(values,userId)}
           >
             <ProFormText
               name="name"
@@ -81,7 +86,7 @@ const editOrAdd = (params) => {
               ]}
             />
             {
-              type === 'add' ?
+              userId ? '' :
                 <ProFormText.Password
                   name="password"
                   label="密码"
@@ -90,10 +95,11 @@ const editOrAdd = (params) => {
                     {required: true, message: '请输入密码'},
                     {min: 6, message: '密码最小6位'}
                   ]}
-                /> : ''
+                />
             }
 
           </ProForm>
+            : <Skeleton active paragraph />
           }
         </Modal>
     </div>

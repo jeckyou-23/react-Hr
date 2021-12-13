@@ -3,10 +3,9 @@ import {request} from 'umi';
 /**
  * 获取商品列表
  * */
-export const getGoodList = async (params) => {
+export const getGoodList = async () => {
   return await request('/api/admin/goods',{
-    method:'GET',
-    params
+    method:'GET'
   })
 }
 
@@ -32,10 +31,10 @@ export const goodsIsRecommend = async (params) => {
 /**
  * 添加商品
  * */
-export const addGoodsA = async (params) => {
+export const addGoodsA = async (data) => {
   return await request('/api/admin/goods', {
     method: 'POST',
-    params
+    data,
   })
 }
 
@@ -51,9 +50,10 @@ export const getGoodsDetail = async (id) => {
 /**
  * 修改商品
  * */
-export const editGoodsMessage = async (params,id) => {
+export const editGoods = async (data,id) => {
   return await request(`/api/admin/goods/${id}`,{
     method:'PUT',
-    params
+    data,
+    useStatus: true
   })
 }
